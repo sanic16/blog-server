@@ -111,3 +111,4 @@ export const getAuthors = async(_req: Request, res: Response, next: NextFunction
         return next(new HttpError('Error al obtener autores', 500))
     }
 }
+
