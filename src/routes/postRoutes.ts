@@ -6,3 +6,5 @@ import authMiddleware from "../middleware/authMiddlware";
 const router = Router()
 
 router.route('/').get(getPosts).post(authMiddleware, upload.single('thumbnail'), createPost)
+
+export default router

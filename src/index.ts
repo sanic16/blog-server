@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { connect } from 'mongoose'
 import { errorHandler, notFound } from './middleware/errorMiddleware'
 import userRoutes from './routes/userRoutes'
+import postRoutes from './routes/postRoutes'
 
 
 const app = express()
@@ -21,7 +22,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 
 app.use('/api/users', userRoutes)
-app.use('/api/posts', userRoutes)
+app.use('/api/posts', postRoutes)
 
 app.use(notFound)
 app.use(errorHandler)
