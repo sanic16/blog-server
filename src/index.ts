@@ -4,14 +4,12 @@ import dotenv from 'dotenv'
 import { connect } from 'mongoose'
 import { errorHandler, notFound } from './middleware/errorMiddleware'
 import userRoutes from './routes/userRoutes'
-import multer from 'multer'
 
 
 const app = express()
 dotenv.config()
 
-const storage = multer.memoryStorage()
-const upload = multer({ storage: storage})
+
 
 app.use(cors({
     credentials: true,
