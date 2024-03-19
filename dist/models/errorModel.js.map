@@ -1,0 +1,1 @@
+{"version":3,"file":"errorModel.js","sourceRoot":"","sources":["../../src/models/errorModel.ts"],"names":[],"mappings":";;AAAA,MAAM,SAAU,SAAQ,KAAK;IAIzB,YAAY,OAAe,EAAE,SAAiB;QAC1C,KAAK,CAAC,OAAO,CAAC,CAAA;QACd,IAAI,CAAC,IAAI,GAAG,SAAS,CAAA;IACzB,CAAC;CACJ;AAED,kBAAe,SAAS,CAAA"}
