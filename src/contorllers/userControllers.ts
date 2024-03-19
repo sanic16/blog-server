@@ -130,7 +130,7 @@ export const changeAvatar = async(req: Request, res: Response, next: NextFunctio
             return next(new HttpError('Usuario no encontrado', 404))
         }
         const file = req.file
-        if(!file ){
+        if(!file || file.fieldname !== 'avatar' ){
             return next(new HttpError('Por favor seleccione una imagen', 400))
         }
 

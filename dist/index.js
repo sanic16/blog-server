@@ -18,6 +18,7 @@ app.use((0, cors_1.default)({
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes_1.default);
+app.use('/api/posts', userRoutes_1.default);
 app.use(errorMiddleware_1.notFound);
 app.use(errorMiddleware_1.errorHandler);
 (0, mongoose_1.connect)(process.env.MONGO_URI).then(() => {

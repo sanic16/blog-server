@@ -19,8 +19,9 @@ app.use(cors({
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
-app.use('/api/users', userRoutes)
 
+app.use('/api/users', userRoutes)
+app.use('/api/posts', userRoutes)
 
 app.use(notFound)
 app.use(errorHandler)

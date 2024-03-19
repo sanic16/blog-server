@@ -134,7 +134,7 @@ const changeAvatar = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             return next(new errorModel_1.default('Usuario no encontrado', 404));
         }
         const file = req.file;
-        if (!file) {
+        if (!file || file.fieldname !== 'avatar') {
             return next(new errorModel_1.default('Por favor seleccione una imagen', 400));
         }
         if (file.size > 500000) {
