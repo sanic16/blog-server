@@ -13,10 +13,12 @@ const postRoutes_1 = __importDefault(require("./routes/postRoutes"));
 const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 dotenv_1.default.config();
-app.use((0, cors_1.default)({
-    credentials: true,
-    origin: '*'
-}));
+if (process.env.NODE_ENV === 'development') {
+    app.use((0, cors_1.default)({
+        credentials: true,
+        origin: '*'
+    }));
+}
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes_1.default);
