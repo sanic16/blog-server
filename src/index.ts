@@ -11,17 +11,12 @@ import path from 'path'
 const app = express()
 dotenv.config()
 
-if(process.env.NODE_ENV === 'development'){
-    app.use(cors({
-        credentials: true,
-        origin: '*'
-    }))
-}else{
-    app.use(cors({
-        credentials: true,
-        origin: "blog.juliosanic.tech"
-    }))
-}
+
+app.use(cors({
+    credentials: true,
+    origin: "blog.juliosanic.tech"
+}))
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
 
