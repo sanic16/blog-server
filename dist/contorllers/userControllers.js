@@ -44,7 +44,7 @@ const registerUser = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             email: newEmail,
             password: hashedPassword
         });
-        res.sendStatus(201);
+        res.status(201).json({ message: 'Usuario registrado con éxito' });
     }
     catch (error) {
         console.log(error);
@@ -153,7 +153,7 @@ const changeAvatar = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             yield (0, s3_1.deleteObject)(filename);
             return next(new errorModel_1.default('Error al cambiar el avatar', 500));
         }
-        res.sendStatus(204);
+        res.status(204).json({ message: 'Avatar cambiado con éxito' });
     }
     catch (error) {
         return next(new errorModel_1.default('Error al cambiar el avatar', 500));

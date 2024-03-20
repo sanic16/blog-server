@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPosts = exports.createPost = void 0;
+exports.deletePost = exports.getUserPosts = exports.getCatPosts = exports.getPost = exports.getPosts = exports.createPost = void 0;
 const postModel_1 = __importStar(require("../models/postModel"));
 const userModel_1 = __importDefault(require("../models/userModel"));
 const uuid_1 = require("uuid");
@@ -78,7 +78,9 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             yield (0, s3_1.deleteObject)(filename);
             return next(new errorModel_1.default('Error al crear la publicación', 500));
         }
-        return res.sendStatus(201);
+        return res.status(201).json({
+            message: 'Post creado con éxito'
+        });
     }
     catch (error) {
         return next(new errorModel_1.default('Error al crear la publicación', 500));
@@ -94,11 +96,100 @@ const getPosts = (_req, res, next) => __awaiter(void 0, void 0, void 0, function
         for (let post of posts) {
             post.thumbnail = yield (0, s3_1.getObjectSignedUrl)(post.thumbnail);
         }
-        return res.json(posts);
+        return res.json({
+            posts: posts
+        });
     }
     catch (error) {
         return next(new errorModel_1.default('Error al obtener publicaciones', 500));
     }
 });
 exports.getPosts = getPosts;
+const getPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const post = yield postModel_1.default.findById(id).select('-__v');
+        if (!post) {
+            return next(new errorModel_1.default('Publicación no encontrada', 404));
+        }
+        post.thumbnail = yield (0, s3_1.getObjectSignedUrl)(post.thumbnail);
+        return res.status(200).json({
+            post
+        });
+    }
+    catch (error) {
+        return next(new errorModel_1.default('Error al obtener la publicación', 500));
+    }
+});
+exports.getPost = getPost;
+const getCatPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id: category } = req.params;
+        const posts = yield postModel_1.default.find({ category }).select('-__v').sort({ updatedAt: -1 });
+        if (!posts) {
+            return next(new errorModel_1.default('No hay publicaciones en esta categoría', 404));
+        }
+        for (let post of posts) {
+            post.thumbnail = yield (0, s3_1.getObjectSignedUrl)(post.thumbnail);
+        }
+        return res.status(200).json({
+            posts
+        });
+    }
+    catch (error) {
+        return next(new errorModel_1.default('Error al obtener publicaciones', 500));
+    }
+});
+exports.getCatPosts = getCatPosts;
+const getUserPosts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id: creator } = req.params;
+        const posts = yield postModel_1.default.find({ creator }).select('-__v').sort({ updatedAt: -1 });
+        if (!posts) {
+            return next(new errorModel_1.default('No hay publicaciones', 404));
+        }
+        for (let post of posts) {
+            post.thumbnail = yield (0, s3_1.getObjectSignedUrl)(post.thumbnail);
+        }
+        return res.status(200).json({
+            posts
+        });
+    }
+    catch (error) {
+        return next(new errorModel_1.default('Error al obtener publicaciones', 500));
+    }
+});
+exports.getUserPosts = getUserPosts;
+const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d;
+    try {
+        const { id } = req.params;
+        const user = yield userModel_1.default.findById((_c = req === null || req === void 0 ? void 0 : req.user) === null || _c === void 0 ? void 0 : _c.id);
+        if (!user) {
+            return next(new errorModel_1.default('Usuario no encontrado', 404));
+        }
+        const post = yield postModel_1.default.findById(id);
+        if (!post) {
+            return next(new errorModel_1.default('Publicación no encontrada', 404));
+        }
+        if (((_d = req === null || req === void 0 ? void 0 : req.user) === null || _d === void 0 ? void 0 : _d.id) !== (post === null || post === void 0 ? void 0 : post.creator.toString())) {
+            return next(new errorModel_1.default('No tienes permiso para realizar esta acción', 403));
+        }
+        const response = yield (0, s3_1.deleteObject)(post.thumbnail);
+        if (!response) {
+            return next(new errorModel_1.default('Error al eliminar la publicación', 500));
+        }
+        const deletedPost = yield postModel_1.default.findByIdAndDelete(id);
+        if (!deletedPost) {
+            return next(new errorModel_1.default('Error al eliminar la publicación', 500));
+        }
+        return res.status(200).json({
+            message: 'Publicación eliminada con éxito'
+        });
+    }
+    catch (error) {
+        return next(new errorModel_1.default('Error al eliminar la publicación', 500));
+    }
+});
+exports.deletePost = deletePost;
 //# sourceMappingURL=postController.js.map

@@ -39,7 +39,7 @@ export const registerUser = async(req: Request, res: Response, next: NextFunctio
             email: newEmail,
             password: hashedPassword
         })
-        res.sendStatus(201)
+        res.status(201).json({message: 'Usuario registrado con éxito'})
     } catch (error) {
         console.log(error)
         return next(new HttpError('Error al registrar nuevo usuario', 500))
@@ -152,7 +152,7 @@ export const changeAvatar = async(req: Request, res: Response, next: NextFunctio
             return next(new HttpError('Error al cambiar el avatar', 500))
         }
         
-        res.sendStatus(204)
+        res.status(204).json({message: 'Avatar cambiado con éxito'})
         
     } catch (error) {
         return next(new HttpError('Error al cambiar el avatar', 500))

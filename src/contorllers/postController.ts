@@ -46,7 +46,9 @@ export const createPost = async (req: Request, res: Response, next: NextFunction
             return next(new HttpError('Error al crear la publicación', 500))
         }
 
-        return res.sendStatus(201)
+        return res.status(201).json({
+            message: 'Post creado con éxito'
+        })
 
     } catch (error) {
         return next(new HttpError('Error al crear la publicación', 500))
@@ -62,8 +64,93 @@ export const getPosts = async (_req: Request, res: Response, next: NextFunction)
         for(let post of posts){
             post.thumbnail = await getObjectSignedUrl(post.thumbnail)
         }
-        return res.json(posts)
+        return res.json({
+            posts: posts
+        })
     } catch (error) {
         return next(new HttpError('Error al obtener publicaciones', 500))
+    }
+}
+
+export const getPost = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const post = await Post.findById(id).select('-__v')
+        if(!post){
+            return next(new HttpError('Publicación no encontrada', 404))
+        }
+        post.thumbnail = await getObjectSignedUrl(post.thumbnail)
+        return res.status(200).json({
+            post
+        })
+    } catch (error) {
+        return next(new HttpError('Error al obtener la publicación', 500))
+    }
+}
+
+export const getCatPosts = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id: category } = req.params
+        const posts = await Post.find({ category }).select('-__v').sort({ updatedAt: -1})
+        if(!posts){
+            return next(new HttpError('No hay publicaciones en esta categoría', 404))
+        }
+        for(let post of posts){
+            post.thumbnail = await getObjectSignedUrl(post.thumbnail)
+        }
+        return res.status(200).json({
+            posts
+        })
+
+    } catch (error) {
+        return next(new HttpError('Error al obtener publicaciones', 500)) 
+    }
+}
+
+export const getUserPosts = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id: creator } = req.params
+        const posts = await Post.find({ creator }).select('-__v').sort({ updatedAt: -1})
+        if(!posts){
+            return next(new HttpError('No hay publicaciones', 404))
+        }
+        for(let post of posts){
+            post.thumbnail = await getObjectSignedUrl(post.thumbnail)
+        }
+        return res.status(200).json({
+            posts
+        })
+    } catch (error) {
+        return next(new HttpError('Error al obtener publicaciones', 500))
+    }
+}
+
+export const deletePost = async(req: Request, res: Response, next: NextFunction) => {
+    try {
+        const {id } = req.params
+        const user = await User.findById(req?.user?.id)
+        if(!user){
+            return next(new HttpError('Usuario no encontrado', 404))
+        }
+        const post = await Post.findById(id)
+        if(!post){
+            return next(new HttpError('Publicación no encontrada', 404))
+        }
+        if(req?.user?.id !== post?.creator.toString()){
+            return next(new HttpError('No tienes permiso para realizar esta acción', 403))
+        }
+        const response = await deleteObject(post.thumbnail)
+        if(!response){
+            return next(new HttpError('Error al eliminar la publicación', 500))
+        }
+        const deletedPost = await Post.findByIdAndDelete(id)
+        if(!deletedPost){
+            return next(new HttpError('Error al eliminar la publicación', 500))
+        }
+        return res.status(200).json({
+            message: 'Publicación eliminada con éxito'
+        })
+    } catch (error) {
+        return next(new HttpError('Error al eliminar la publicación', 500)) 
     }
 }
