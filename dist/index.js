@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === 'development') {
 else {
     app.use((0, cors_1.default)({
         credentials: true,
-        origin: "https://blog.juliosanic.tech/"
+        origin: "blog.juliosanic.tech"
     }));
 }
 app.use(express_1.default.json());
