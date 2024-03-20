@@ -8,6 +8,6 @@ const router = Router()
 router.route('/').get(getPosts).post(authMiddleware, upload.single('thumbnail'), createPost)
 router.get('/:id', getPost)
 router.delete('/:id', authMiddleware, deletePost)
-router.get('/category/:id', getCatPosts)
+router.get('/categories/:id', getCatPosts)
 router.get('/users/:id', getUserPosts)
 export default router
