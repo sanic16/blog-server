@@ -19,7 +19,7 @@ if(process.env.NODE_ENV === 'development'){
 }else{
     app.use(cors({
         credentials: true,
-        origin: process.env.FRONTEND_URL
+        origin: "https://blog.juliosanic.tech/"
     }))
 }
 app.use(express.json())
