@@ -19,6 +19,12 @@ if (process.env.NODE_ENV === 'development') {
         origin: '*'
     }));
 }
+else {
+    app.use((0, cors_1.default)({
+        credentials: true,
+        origin: process.env.FRONTEND_URL
+    }));
+}
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use('/api/users', userRoutes_1.default);
