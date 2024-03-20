@@ -5,6 +5,7 @@ import { connect } from 'mongoose'
 import { errorHandler, notFound } from './middleware/errorMiddleware'
 import userRoutes from './routes/userRoutes'
 import postRoutes from './routes/postRoutes'
+import path from 'path'
 
 
 const app = express()
@@ -23,6 +24,12 @@ app.use(express.urlencoded({ extended: true}))
 
 app.use('/api/users', userRoutes)
 app.use('/api/posts', postRoutes)
+
+app.use(express.static(path.join(__dirname, '/react')))
+app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '/react/index.html'))
+    console.log(path.join(__dirname, '/react/index.html'))
+})
 
 app.use(notFound)
 app.use(errorHandler)

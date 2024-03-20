@@ -1,1 +1,1 @@
-web: npm run build && npm run start
+web: npm run build && cp -r react dist && npm run start
