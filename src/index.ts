@@ -14,7 +14,7 @@ dotenv.config()
 
 app.use(cors({
     credentials: true,
-    origin: "*",
+    origin: "https://blog.juliosanic.tech"
 }))
 
 app.use(express.json())
