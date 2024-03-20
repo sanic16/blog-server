@@ -173,8 +173,8 @@ export const editPost = async(req: Request, res: Response, next: NextFunction) =
     if(description.trim().length < 50){
         return next(new HttpError('El contenido debe tener al menos 50 caracteres', 400))
     }
-    if(title.trim().length < 10){
-        return next(new HttpError('El título debe tener al menos 10 caracteres', 400))
+    if(title.trim().length < 3){
+        return next(new HttpError('El título debe tener al menos 3 caracteres', 400))
     }
 
    

@@ -209,8 +209,8 @@ const editPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     if (description.trim().length < 50) {
         return next(new errorModel_1.default('El contenido debe tener al menos 50 caracteres', 400));
     }
-    if (title.trim().length < 10) {
-        return next(new errorModel_1.default('El título debe tener al menos 10 caracteres', 400));
+    if (title.trim().length < 3) {
+        return next(new errorModel_1.default('El título debe tener al menos 3 caracteres', 400));
     }
     try {
         const post = yield postModel_1.default.findById(id);
