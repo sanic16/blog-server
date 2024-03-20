@@ -149,6 +149,8 @@ export const deletePost = async(req: Request, res: Response, next: NextFunction)
         if(!deletedPost){
             return next(new HttpError('Error al eliminar la publicación', 500))
         }
+        user.posts -= 1
+        await user.save()
         return res.status(200).json({
             message: 'Publicación eliminada con éxito'
         })

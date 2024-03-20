@@ -185,6 +185,8 @@ const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (!deletedPost) {
             return next(new errorModel_1.default('Error al eliminar la publicación', 500));
         }
+        user.posts -= 1;
+        yield user.save();
         return res.status(200).json({
             message: 'Publicación eliminada con éxito'
         });
