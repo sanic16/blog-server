@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePost = exports.getUserPosts = exports.getCatPosts = exports.getPost = exports.getPosts = exports.createPost = void 0;
+exports.editPost = exports.deletePost = exports.getUserPosts = exports.getCatPosts = exports.getPost = exports.getPosts = exports.createPost = void 0;
 const postModel_1 = __importStar(require("../models/postModel"));
 const userModel_1 = __importDefault(require("../models/userModel"));
 const uuid_1 = require("uuid");
@@ -58,7 +58,7 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         if (file.size > 1000000) {
             return next(new errorModel_1.default('El archivo es demasiado grande', 400));
         }
-        const user = userModel_1.default.findById((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.id);
+        const user = yield userModel_1.default.findById((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.id);
         if (!user) {
             return next(new errorModel_1.default('Usuario no encontrado', 404));
         }
@@ -78,6 +78,8 @@ const createPost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             yield (0, s3_1.deleteObject)(filename);
             return next(new errorModel_1.default('Error al crear la publicación', 500));
         }
+        user.posts += 1;
+        yield user.save();
         return res.status(201).json({
             message: 'Post creado con éxito'
         });
@@ -192,4 +194,60 @@ const deletePost = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.deletePost = deletePost;
+const editPost = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _e;
+    const { id } = req.params;
+    const { title, category, description } = req.body;
+    if (!title || !category || !description) {
+        return next(new errorModel_1.default('Por favor llene todos los campos', 400));
+    }
+    if (!postModel_1.categories.includes(category)) {
+        return next(new errorModel_1.default('Categoría no válida', 400));
+    }
+    if (description.trim().length < 50) {
+        return next(new errorModel_1.default('El contenido debe tener al menos 50 caracteres', 400));
+    }
+    if (title.trim().length < 10) {
+        return next(new errorModel_1.default('El título debe tener al menos 10 caracteres', 400));
+    }
+    try {
+        const post = yield postModel_1.default.findById(id);
+        if (!post) {
+            return next(new errorModel_1.default('Publicación no encontrada', 404));
+        }
+        if (((_e = req === null || req === void 0 ? void 0 : req.user) === null || _e === void 0 ? void 0 : _e.id) !== (post === null || post === void 0 ? void 0 : post.creator.toString())) {
+            return next(new errorModel_1.default('No tienes permiso para realizar esta acción', 403));
+        }
+        post.title = title;
+        post.category = category;
+        post.description = description;
+        if (req.file) {
+            if (req.file.fieldname !== 'thumbnail') {
+                return next(new errorModel_1.default('Por favor seleccione una imagen', 400));
+            }
+            const file = req.file;
+            if (file.size > 1000000) {
+                return next(new errorModel_1.default('El archivo es demasiado grande', 400));
+            }
+            const filename = `${(0, uuid_1.v4)()}-${file.originalname}`;
+            const response = yield (0, s3_1.uploadObject)(file.buffer, filename, file.mimetype);
+            if (!response) {
+                return next(new errorModel_1.default('Error al subir la imagen', 500));
+            }
+            const deleted = yield (0, s3_1.deleteObject)(post.thumbnail);
+            if (!deleted) {
+                return next(new errorModel_1.default('Error al editar la publicación', 500));
+            }
+            post.thumbnail = filename;
+        }
+        yield post.save();
+        return res.status(200).json({
+            message: 'Publicación editada con éxito'
+        });
+    }
+    catch (error) {
+        return next(new errorModel_1.default('Error al editar la publicación', 500));
+    }
+});
+exports.editPost = editPost;
 //# sourceMappingURL=postController.js.map
